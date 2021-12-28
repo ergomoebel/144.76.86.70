@@ -1,16 +1,11 @@
-
 <Directory /var/www/ergomoebel.at>
-		AllowOverride None
-				Require all denied
-		</Directory>
-
+	AllowOverride None
+	Require all denied
+</Directory>
 <VirtualHost *:80>
-
-
-					DocumentRoot /var/www/clients/client1/web1/web
-			
-		ServerName ergomoebel.at
-		ServerAlias www.ergomoebel.at 
+	DocumentRoot /var/www/clients/client1/web1/web
+	ServerName ergomoebel.at
+	ServerAlias www.ergomoebel.at
     ServerAlias www.xn--ergonomische-mbel-d0b.at xn--ergonomische-mbel-d0b.at 
     ServerAlias www.ergo-moebel.at ergo-moebel.at 
     ServerAlias www.ergomoebel.com ergomoebel.com 
@@ -27,297 +22,212 @@
     ServerAlias www.ergoshop.at ergoshop.at 
     ServerAlias www.shopmusic.at shopmusic.at 
     ServerAlias www.bewegtsitzen.at bewegtsitzen.at
-		ServerAdmin webmaster@ergomoebel.at
-
-
-		ErrorLog /var/log/ispconfig/httpd/ergomoebel.at/error.log
-
-
-
+	ServerAdmin webmaster@ergomoebel.at
+	ErrorLog /var/log/ispconfig/httpd/ergomoebel.at/error.log
+	<Directory /var/www/ergomoebel.at/web>
+		# Clear PHP settings of this website
+		<FilesMatch ".+\.ph(p[345]?|t|tml)$">
+			SetHandler None
+		</FilesMatch>
+		Options +SymlinksIfOwnerMatch
+		AllowOverride All
+		Require all granted
+	</Directory>
+	<Directory /var/www/clients/client1/web1/web>
+		# Clear PHP settings of this website
+		<FilesMatch ".+\.ph(p[345]?|t|tml)$">
+			SetHandler None
+		</FilesMatch>
+		Options +SymlinksIfOwnerMatch
+		AllowOverride All
+		Require all granted
+	</Directory>
+	<IfModule mod_fastcgi.c>
+		<Directory /var/www/clients/client1/web1/cgi-bin>
+			Require all granted
+		</Directory>
 		<Directory /var/www/ergomoebel.at/web>
-				# Clear PHP settings of this website
-				<FilesMatch ".+\.ph(p[345]?|t|tml)$">
-						SetHandler None
-				</FilesMatch>
-				Options +SymlinksIfOwnerMatch
-				AllowOverride All
-								Require all granted
-						</Directory>
+			<FilesMatch "\.php[345]?$">
+				<If "-f '%{REQUEST_FILENAME}'">
+					SetHandler php-fcgi
+				</If>
+			</FilesMatch>
+		</Directory>
 		<Directory /var/www/clients/client1/web1/web>
-				# Clear PHP settings of this website
-				<FilesMatch ".+\.ph(p[345]?|t|tml)$">
-						SetHandler None
-				</FilesMatch>
-				Options +SymlinksIfOwnerMatch
-				AllowOverride All
-								Require all granted
-						</Directory>
-
-
-
-
-		<IfModule mod_fastcgi.c>
-				<Directory /var/www/clients/client1/web1/cgi-bin>
-										Require all granted
-								    </Directory>
-				<Directory /var/www/ergomoebel.at/web>
-					<FilesMatch "\.php[345]?$">
-						<If "-f '%{REQUEST_FILENAME}'">
-							SetHandler php-fcgi
-						</If>
-					</FilesMatch>
-				</Directory>
-				<Directory /var/www/clients/client1/web1/web>
-					<FilesMatch "\.php[345]?$">
-						<If "-f '%{REQUEST_FILENAME}'">
-							SetHandler php-fcgi
-						</If>
-					</FilesMatch>
-				</Directory>
-                Action php-fcgi /php-fcgi virtual
-				Alias /php-fcgi /var/www/clients/client1/web1/cgi-bin/php-fcgi-*-80-ergomoebel.at
-                FastCgiExternalServer /var/www/clients/client1/web1/cgi-bin/php-fcgi-*-80-ergomoebel.at -idle-timeout 300 -socket /var/lib/php7.2-fpm/web1.sock -pass-header Authorization  -pass-header Content-Type
-		</IfModule>
-		<IfModule mod_proxy_fcgi.c>
-			#ProxyPassMatch ^/(.*\.php[345]?(/.*)?)$ unix:///var/lib/php7.2-fpm/web1.sock|fcgi://localhost//var/www/clients/client1/web1/web/$1
-			<Directory /var/www/clients/client1/web1/web>
-				<FilesMatch "\.php[345]?$">
-					<If "-f '%{REQUEST_FILENAME}'">
-						SetHandler "proxy:unix:/var/lib/php7.2-fpm/web1.sock|fcgi://localhost"
-					</If>
-				</FilesMatch>
-			</Directory>
-			</IfModule>
-
-
-		RewriteEngine on
-		RewriteCond %{REQUEST_URI} ^/\.well-known/acme-challenge/
-		RewriteRule ^ - [END]
-		RewriteCond %{HTTP_HOST} ^ergomoebel\.at$ [NC]
-				RewriteRule ^(.*)$ http://www.ergomoebel.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^xn--ergonomische-mbel-d0b\.at$ [NC]
-				RewriteRule ^(.*)$ http://www.xn--ergonomische-mbel-d0b.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^ergo-moebel\.at$ [NC]
-				RewriteRule ^(.*)$ http://www.ergo-moebel.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^ergomoebel\.com$ [NC]
-				RewriteRule ^(.*)$ http://www.ergomoebel.com$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^ergo-moebel\.com$ [NC]
-				RewriteRule ^(.*)$ http://www.ergo-moebel.com$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^futureclass\.at$ [NC]
-				RewriteRule ^(.*)$ http://www.futureclass.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^leitner-moebel\.com$ [NC]
-				RewriteRule ^(.*)$ http://www.leitner-moebel.com$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^notenpult\.at$ [NC]
-				RewriteRule ^(.*)$ http://www.notenpult.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^wipp-sitz\.at$ [NC]
-				RewriteRule ^(.*)$ http://www.wipp-sitz.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^wippsitz\.at$ [NC]
-				RewriteRule ^(.*)$ http://www.wippsitz.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^xn--ergombel-r4a\.at$ [NC]
-				RewriteRule ^(.*)$ http://www.xn--ergombel-r4a.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^xn--ergonomische-sitzmbel-yec\.at$ [NC]
-				RewriteRule ^(.*)$ http://www.xn--ergonomische-sitzmbel-yec.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^ergoshop\.at$ [NC]
-				RewriteRule ^(.*)$ http://www.ergoshop.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^shopmusic\.at$ [NC]
-				RewriteRule ^(.*)$ http://www.shopmusic.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^bewegtsitzen\.at$ [NC]
-				RewriteRule ^(.*)$ http://www.bewegtsitzen.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST}   ^xn--ergonomische-mbel-d0b\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.xn--ergonomische-mbel-d0b\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^ergo-moebel\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.ergo-moebel\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^ergomoebel\.com$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.ergomoebel\.com$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^ergo-moebel\.com$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.ergo-moebel\.com$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^futureclass\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at/anwendung/schule  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.futureclass\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at/anwendung/schule  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^leitner-moebel\.com$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.leitner-moebel\.com$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^newsletter\.ergomoebel\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^notenpult\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.notenpult\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^wipp-sitz\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.wipp-sitz\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^wippsitz\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.wippsitz\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^xn--ergombel-r4a\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.xn--ergombel-r4a\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^xn--ergonomische-sitzmbel-yec\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.xn--ergonomische-sitzmbel-yec\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^ergoshop\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at/shop/$1  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.ergoshop\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at/shop/$1  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^shopmusic\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at/shop/musik/$1  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.shopmusic\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at/shop/musik/$1  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^bewegtsitzen\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.bewegtsitzen\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-        RewriteCond %{HTTPS} off
-                RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,NE]
-
-		# add support for apache mpm_itk
-		<IfModule mpm_itk_module>
-			AssignUserId web1 client1
-		</IfModule>
-
-		<IfModule mod_dav_fs.c>
+			<FilesMatch "\.php[345]?$">
+				<If "-f '%{REQUEST_FILENAME}'">
+					SetHandler php-fcgi
+				</If>
+			</FilesMatch>
+		</Directory>
+		Action php-fcgi /php-fcgi virtual
+		Alias /php-fcgi /var/www/clients/client1/web1/cgi-bin/php-fcgi-*-80-ergomoebel.at
+		FastCgiExternalServer /var/www/clients/client1/web1/cgi-bin/php-fcgi-*-80-ergomoebel.at -idle-timeout 300 -socket /var/lib/php7.2-fpm/web1.sock -pass-header Authorization  -pass-header Content-Type
+	</IfModule>
+	<IfModule mod_proxy_fcgi.c>
+		#ProxyPassMatch ^/(.*\.php[345]?(/.*)?)$ unix:///var/lib/php7.2-fpm/web1.sock|fcgi://localhost//var/www/clients/client1/web1/web/$1
+		<Directory /var/www/clients/client1/web1/web>
+			<FilesMatch "\.php[345]?$">
+				<If "-f '%{REQUEST_FILENAME}'">
+					SetHandler "proxy:unix:/var/lib/php7.2-fpm/web1.sock|fcgi://localhost"
+				</If>
+			</FilesMatch>
+		</Directory>
+	</IfModule>
+	RewriteEngine on
+	RewriteCond %{REQUEST_URI} ^/\.well-known/acme-challenge/
+	RewriteRule ^ - [END]
+	RewriteCond %{HTTP_HOST} ^ergomoebel\.at$ [NC]
+	RewriteRule ^(.*)$ http://www.ergomoebel.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^xn--ergonomische-mbel-d0b\.at$ [NC]
+	RewriteRule ^(.*)$ http://www.xn--ergonomische-mbel-d0b.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^ergo-moebel\.at$ [NC]
+	RewriteRule ^(.*)$ http://www.ergo-moebel.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^ergomoebel\.com$ [NC]
+	RewriteRule ^(.*)$ http://www.ergomoebel.com$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^ergo-moebel\.com$ [NC]
+	RewriteRule ^(.*)$ http://www.ergo-moebel.com$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^futureclass\.at$ [NC]
+	RewriteRule ^(.*)$ http://www.futureclass.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^leitner-moebel\.com$ [NC]
+	RewriteRule ^(.*)$ http://www.leitner-moebel.com$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^notenpult\.at$ [NC]
+	RewriteRule ^(.*)$ http://www.notenpult.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^wipp-sitz\.at$ [NC]
+	RewriteRule ^(.*)$ http://www.wipp-sitz.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^wippsitz\.at$ [NC]
+	RewriteRule ^(.*)$ http://www.wippsitz.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^xn--ergombel-r4a\.at$ [NC]
+	RewriteRule ^(.*)$ http://www.xn--ergombel-r4a.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^xn--ergonomische-sitzmbel-yec\.at$ [NC]
+	RewriteRule ^(.*)$ http://www.xn--ergonomische-sitzmbel-yec.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^ergoshop\.at$ [NC]
+	RewriteRule ^(.*)$ http://www.ergoshop.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^shopmusic\.at$ [NC]
+	RewriteRule ^(.*)$ http://www.shopmusic.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^bewegtsitzen\.at$ [NC]
+	RewriteRule ^(.*)$ http://www.bewegtsitzen.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^xn--ergonomische-mbel-d0b\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.xn--ergonomische-mbel-d0b\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^ergo-moebel\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.ergo-moebel\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^ergomoebel\.com$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.ergomoebel\.com$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^ergo-moebel\.com$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.ergo-moebel\.com$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^futureclass\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at/anwendung/schule  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.futureclass\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at/anwendung/schule  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^leitner-moebel\.com$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.leitner-moebel\.com$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^newsletter\.ergomoebel\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^notenpult\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.notenpult\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^wipp-sitz\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.wipp-sitz\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^wippsitz\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.wippsitz\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^xn--ergombel-r4a\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.xn--ergombel-r4a\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^xn--ergonomische-sitzmbel-yec\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.xn--ergonomische-sitzmbel-yec\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^ergoshop\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at/shop/$1  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.ergoshop\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at/shop/$1  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^shopmusic\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at/shop/musik/$1  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.shopmusic\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at/shop/musik/$1  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^bewegtsitzen\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.bewegtsitzen\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTPS} off
+	RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,NE]
+	# add support for apache mpm_itk
+	<IfModule mpm_itk_module>
+		AssignUserId web1 client1
+	</IfModule>
+	<IfModule mod_dav_fs.c>
 		# Do not execute PHP files in webdav directory
-			<Directory /var/www/clients/client1/web1/webdav>
-				<ifModule mod_security2.c>
-					SecRuleRemoveById 960015
-					SecRuleRemoveById 960032
-				</ifModule>
-				<FilesMatch "\.ph(p3?|tml)$">
-					SetHandler None
-				</FilesMatch>
-			</Directory>
-			DavLockDB /var/www/clients/client1/web1/tmp/DavLock
-			# DO NOT REMOVE THE COMMENTS!
-			# IF YOU REMOVE THEM, WEBDAV WILL NOT WORK ANYMORE!
-      # WEBDAV BEGIN
-			# WEBDAV END
-		</IfModule>
-
-<IfModule mod_proxy_fcgi.c>
-    #ProxyPassMatch ^/(.*\.php[345]?(/.*)?)$ unix:///var/lib/php7.2-fpm/custom_web1.sock|fcgi://localhost//var/www/clients/client1/web1/web/$1
-    <Directory /var/www/clients/client1/web1/web/shop>
-        <FilesMatch "\.php[345]?$">
-            <If "-f '%{REQUEST_FILENAME}'">
-                SetHandler "proxy:unix:/var/lib/php7.2-fpm/custom_web1.sock|fcgi://localhost"
-            </If>
-        </FilesMatch>
-    </Directory>
-</IfModule>
-
-
-
+		<Directory /var/www/clients/client1/web1/webdav>
+			<ifModule mod_security2.c>
+				SecRuleRemoveById 960015
+				SecRuleRemoveById 960032
+			</ifModule>
+			<FilesMatch "\.ph(p3?|tml)$">
+				SetHandler None
+			</FilesMatch>
+		</Directory>
+		DavLockDB /var/www/clients/client1/web1/tmp/DavLock
+		# DO NOT REMOVE THE COMMENTS!
+		# IF YOU REMOVE THEM, WEBDAV WILL NOT WORK ANYMORE!
+		# WEBDAV BEGIN
+		# WEBDAV END
+	</IfModule>
+	<IfModule mod_proxy_fcgi.c>
+		#ProxyPassMatch ^/(.*\.php[345]?(/.*)?)$ unix:///var/lib/php7.2-fpm/custom_web1.sock|fcgi://localhost//var/www/clients/client1/web1/web/$1
+		<Directory /var/www/clients/client1/web1/web/shop>
+			<FilesMatch "\.php[345]?$">
+				<If "-f '%{REQUEST_FILENAME}'">
+					SetHandler "proxy:unix:/var/lib/php7.2-fpm/custom_web1.sock|fcgi://localhost"
+				</If>
+			</FilesMatch>
+		</Directory>
+	</IfModule>
 </VirtualHost>
-
-
 <VirtualHost *:443>
-
-
-					DocumentRoot /var/www/clients/client1/web1/web
-			
-		ServerName ergomoebel.at
-		ServerAlias www.ergomoebel.at 
-    ServerAlias www.xn--ergonomische-mbel-d0b.at xn--ergonomische-mbel-d0b.at 
-    ServerAlias www.ergo-moebel.at ergo-moebel.at 
-    ServerAlias www.ergomoebel.com ergomoebel.com 
-    ServerAlias www.ergo-moebel.com ergo-moebel.com 
-    ServerAlias www.futureclass.at futureclass.at 
-    ServerAlias www.leitner-moebel.com leitner-moebel.com 
-    ServerAlias newsletter.ergomoebel.at 
-    ServerAlias www.notenpult.at notenpult.at 
-    ServerAlias testlive.swoppershop.at 
-    ServerAlias www.wipp-sitz.at wipp-sitz.at 
-    ServerAlias www.wippsitz.at wippsitz.at 
-    ServerAlias www.xn--ergombel-r4a.at xn--ergombel-r4a.at 
-    ServerAlias www.xn--ergonomische-sitzmbel-yec.at xn--ergonomische-sitzmbel-yec.at 
-    ServerAlias www.ergoshop.at ergoshop.at 
-    ServerAlias www.shopmusic.at shopmusic.at 
-    ServerAlias www.bewegtsitzen.at bewegtsitzen.at
-		ServerAdmin webmaster@ergomoebel.at
-
-		<IfModule mod_http2.c>
-			Protocols h2 http/1.1
-		</IfModule>
-
-		<IfModule mod_brotli.c>
-			AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css text/javascript application/x-javascript application/javascript application/xml application/xml+rss application/atom+xml application/json application/x-font-ttf application/vnd.ms-fontobject image/x-icon
-		</IfModule>
-
-		ErrorLog /var/log/ispconfig/httpd/ergomoebel.at/error.log
-
-
-  <IfModule mod_ssl.c>
+	DocumentRoot /var/www/clients/client1/web1/web
+	ServerName ergomoebel.at
+	ServerAlias www.ergomoebel.at
+	ServerAlias www.xn--ergonomische-mbel-d0b.at xn--ergonomische-mbel-d0b.at
+	ServerAlias www.ergo-moebel.at ergo-moebel.at
+	ServerAlias www.ergomoebel.com ergomoebel.com
+	ServerAlias www.ergo-moebel.com ergo-moebel.com
+	ServerAlias www.futureclass.at futureclass.at
+	ServerAlias www.leitner-moebel.com leitner-moebel.com
+	ServerAlias newsletter.ergomoebel.at
+	ServerAlias www.notenpult.at notenpult.at
+	ServerAlias testlive.swoppershop.at
+	ServerAlias www.wipp-sitz.at wipp-sitz.at
+	ServerAlias www.wippsitz.at wippsitz.at
+	ServerAlias www.xn--ergombel-r4a.at xn--ergombel-r4a.at
+	ServerAlias www.xn--ergonomische-sitzmbel-yec.at xn--ergonomische-sitzmbel-yec.at
+	ServerAlias www.ergoshop.at ergoshop.at
+	ServerAlias www.shopmusic.at shopmusic.at
+	ServerAlias www.bewegtsitzen.at bewegtsitzen.at
+	ServerAdmin webmaster@ergomoebel.at
+	<IfModule mod_http2.c>
+		Protocols h2 http/1.1
+	</IfModule>
+	<IfModule mod_brotli.c>
+		AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css text/javascript application/x-javascript application/javascript application/xml application/xml+rss application/atom+xml application/json application/x-font-ttf application/vnd.ms-fontobject image/x-icon
+	</IfModule>
+	ErrorLog /var/log/ispconfig/httpd/ergomoebel.at/error.log
+	<IfModule mod_ssl.c>
 		SSLEngine on
 		SSLProtocol All -SSLv2 -SSLv3 -TLSv1 -TLSv1.1
 		# SSLCipherSuite          ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS
@@ -327,258 +237,183 @@
 		# </IfModule>
 		SSLCertificateFile /var/www/clients/client1/web1/ssl/ergomoebel.at-le.crt
 		SSLCertificateKeyFile /var/www/clients/client1/web1/ssl/ergomoebel.at-le.key
-				  SSLUseStapling on
-		  SSLStaplingResponderTimeout 5
-		  SSLStaplingReturnResponderErrors off
-		      </IfModule>
-
-		<Directory /var/www/ergomoebel.at/web>
-				# Clear PHP settings of this website
-				<FilesMatch ".+\.ph(p[345]?|t|tml)$">
-						SetHandler None
-				</FilesMatch>
-				Options +SymlinksIfOwnerMatch
-				AllowOverride All
-								Require all granted
-						</Directory>
+		SSLUseStapling on
+		SSLStaplingResponderTimeout 5
+		SSLStaplingReturnResponderErrors off
+	</IfModule>
+	<Directory /var/www/ergomoebel.at/web>
+		# Clear PHP settings of this website
+		<FilesMatch ".+\.ph(p[345]?|t|tml)$">
+			SetHandler None
+		</FilesMatch>
+		Options +SymlinksIfOwnerMatch
+		AllowOverride All
+		Require all granted
+	</Directory>
+	<Directory /var/www/clients/client1/web1/web>
+		# Clear PHP settings of this website
+		<FilesMatch ".+\.ph(p[345]?|t|tml)$">
+			SetHandler None
+		</FilesMatch>
+		Options +SymlinksIfOwnerMatch
+		AllowOverride All
+		Require all granted
+	</Directory>
+	<IfModule mod_fastcgi.c>
+	<Directory /var/www/clients/client1/web1/cgi-bin>
+	Require all granted
+	</Directory>
+	<Directory /var/www/ergomoebel.at/web>
+		<FilesMatch "\.php[345]?$">
+			<If "-f '%{REQUEST_FILENAME}'">
+				SetHandler php-fcgi
+			</If>
+		</FilesMatch>
+	</Directory>
+	<Directory /var/www/clients/client1/web1/web>
+		<FilesMatch "\.php[345]?$">
+		<If "-f '%{REQUEST_FILENAME}'">
+		SetHandler php-fcgi
+		</If>
+		</FilesMatch>
+		</Directory>
+		Action php-fcgi /php-fcgi virtual
+		Alias /php-fcgi /var/www/clients/client1/web1/cgi-bin/php-fcgi-*-443-ergomoebel.at
+		FastCgiExternalServer /var/www/clients/client1/web1/cgi-bin/php-fcgi-*-443-ergomoebel.at -idle-timeout 300 -socket /var/lib/php7.2-fpm/web1.sock -pass-header Authorization  -pass-header Content-Type
+	</IfModule>
+	<IfModule mod_proxy_fcgi.c>
+		#ProxyPassMatch ^/(.*\.php[345]?(/.*)?)$ unix:///var/lib/php7.2-fpm/web1.sock|fcgi://localhost//var/www/clients/client1/web1/web/$1
 		<Directory /var/www/clients/client1/web1/web>
-				# Clear PHP settings of this website
-				<FilesMatch ".+\.ph(p[345]?|t|tml)$">
-						SetHandler None
-				</FilesMatch>
-				Options +SymlinksIfOwnerMatch
-				AllowOverride All
-								Require all granted
-						</Directory>
-
-
-
-
-		<IfModule mod_fastcgi.c>
-				<Directory /var/www/clients/client1/web1/cgi-bin>
-										Require all granted
-								    </Directory>
-				<Directory /var/www/ergomoebel.at/web>
-					<FilesMatch "\.php[345]?$">
-						<If "-f '%{REQUEST_FILENAME}'">
-							SetHandler php-fcgi
-						</If>
-					</FilesMatch>
-				</Directory>
-				<Directory /var/www/clients/client1/web1/web>
-					<FilesMatch "\.php[345]?$">
-						<If "-f '%{REQUEST_FILENAME}'">
-							SetHandler php-fcgi
-						</If>
-					</FilesMatch>
-				</Directory>
-                Action php-fcgi /php-fcgi virtual
-				Alias /php-fcgi /var/www/clients/client1/web1/cgi-bin/php-fcgi-*-443-ergomoebel.at
-                FastCgiExternalServer /var/www/clients/client1/web1/cgi-bin/php-fcgi-*-443-ergomoebel.at -idle-timeout 300 -socket /var/lib/php7.2-fpm/web1.sock -pass-header Authorization  -pass-header Content-Type
-		</IfModule>
-		<IfModule mod_proxy_fcgi.c>
-			#ProxyPassMatch ^/(.*\.php[345]?(/.*)?)$ unix:///var/lib/php7.2-fpm/web1.sock|fcgi://localhost//var/www/clients/client1/web1/web/$1
-			<Directory /var/www/clients/client1/web1/web>
-				<FilesMatch "\.php[345]?$">
-					<If "-f '%{REQUEST_FILENAME}'">
-						SetHandler "proxy:unix:/var/lib/php7.2-fpm/web1.sock|fcgi://localhost"
-					</If>
-				</FilesMatch>
-			</Directory>
-			</IfModule>
-
-
-		RewriteEngine on
-		RewriteCond %{REQUEST_URI} ^/\.well-known/acme-challenge/
-		RewriteRule ^ - [END]
-		RewriteCond %{HTTP_HOST} ^ergomoebel\.at$ [NC]
-				RewriteRule ^(.*)$ https://www.ergomoebel.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^xn--ergonomische-mbel-d0b\.at$ [NC]
-				RewriteRule ^(.*)$ https://www.xn--ergonomische-mbel-d0b.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^ergo-moebel\.at$ [NC]
-				RewriteRule ^(.*)$ https://www.ergo-moebel.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^ergomoebel\.com$ [NC]
-				RewriteRule ^(.*)$ https://www.ergomoebel.com$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^ergo-moebel\.com$ [NC]
-				RewriteRule ^(.*)$ https://www.ergo-moebel.com$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^futureclass\.at$ [NC]
-				RewriteRule ^(.*)$ https://www.futureclass.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^leitner-moebel\.com$ [NC]
-				RewriteRule ^(.*)$ https://www.leitner-moebel.com$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^notenpult\.at$ [NC]
-				RewriteRule ^(.*)$ https://www.notenpult.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^wipp-sitz\.at$ [NC]
-				RewriteRule ^(.*)$ https://www.wipp-sitz.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^wippsitz\.at$ [NC]
-				RewriteRule ^(.*)$ https://www.wippsitz.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^xn--ergombel-r4a\.at$ [NC]
-				RewriteRule ^(.*)$ https://www.xn--ergombel-r4a.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^xn--ergonomische-sitzmbel-yec\.at$ [NC]
-				RewriteRule ^(.*)$ https://www.xn--ergonomische-sitzmbel-yec.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^ergoshop\.at$ [NC]
-				RewriteRule ^(.*)$ https://www.ergoshop.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^shopmusic\.at$ [NC]
-				RewriteRule ^(.*)$ https://www.shopmusic.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^bewegtsitzen\.at$ [NC]
-				RewriteRule ^(.*)$ https://www.bewegtsitzen.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST}   ^xn--ergonomische-mbel-d0b\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.xn--ergonomische-mbel-d0b\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^ergo-moebel\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.ergo-moebel\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^ergomoebel\.com$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.ergomoebel\.com$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^ergo-moebel\.com$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.ergo-moebel\.com$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^futureclass\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at/anwendung/schule  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.futureclass\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at/anwendung/schule  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^leitner-moebel\.com$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.leitner-moebel\.com$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^newsletter\.ergomoebel\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^notenpult\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.notenpult\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^wipp-sitz\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.wipp-sitz\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^wippsitz\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.wippsitz\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^xn--ergombel-r4a\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.xn--ergombel-r4a\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^xn--ergonomische-sitzmbel-yec\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.xn--ergonomische-sitzmbel-yec\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^ergoshop\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at/shop/$1  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.ergoshop\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at/shop/$1  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^shopmusic\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at/shop/musik/$1  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.shopmusic\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at/shop/musik/$1  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^bewegtsitzen\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-		RewriteCond %{HTTP_HOST}   ^www\.bewegtsitzen\.at$ [NC]
-		
-		RewriteRule   ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
-
-
-		# add support for apache mpm_itk
-		<IfModule mpm_itk_module>
-			AssignUserId web1 client1
-		</IfModule>
-
-		<IfModule mod_dav_fs.c>
+			<FilesMatch "\.php[345]?$">
+				<If "-f '%{REQUEST_FILENAME}'">
+					SetHandler "proxy:unix:/var/lib/php7.2-fpm/web1.sock|fcgi://localhost"
+				</If>
+			</FilesMatch>
+		</Directory>
+	</IfModule>
+	RewriteEngine on
+	RewriteCond %{REQUEST_URI} ^/\.well-known/acme-challenge/
+	RewriteRule ^ - [END]
+	RewriteCond %{HTTP_HOST} ^ergomoebel\.at$ [NC]
+	RewriteRule ^(.*)$ https://www.ergomoebel.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^xn--ergonomische-mbel-d0b\.at$ [NC]
+	RewriteRule ^(.*)$ https://www.xn--ergonomische-mbel-d0b.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^ergo-moebel\.at$ [NC]
+	RewriteRule ^(.*)$ https://www.ergo-moebel.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^ergomoebel\.com$ [NC]
+	RewriteRule ^(.*)$ https://www.ergomoebel.com$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^ergo-moebel\.com$ [NC]
+	RewriteRule ^(.*)$ https://www.ergo-moebel.com$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^futureclass\.at$ [NC]
+	RewriteRule ^(.*)$ https://www.futureclass.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^leitner-moebel\.com$ [NC]
+	RewriteRule ^(.*)$ https://www.leitner-moebel.com$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^notenpult\.at$ [NC]
+	RewriteRule ^(.*)$ https://www.notenpult.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^wipp-sitz\.at$ [NC]
+	RewriteRule ^(.*)$ https://www.wipp-sitz.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^wippsitz\.at$ [NC]
+	RewriteRule ^(.*)$ https://www.wippsitz.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^xn--ergombel-r4a\.at$ [NC]
+	RewriteRule ^(.*)$ https://www.xn--ergombel-r4a.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^xn--ergonomische-sitzmbel-yec\.at$ [NC]
+	RewriteRule ^(.*)$ https://www.xn--ergonomische-sitzmbel-yec.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^ergoshop\.at$ [NC]
+	RewriteRule ^(.*)$ https://www.ergoshop.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^shopmusic\.at$ [NC]
+	RewriteRule ^(.*)$ https://www.shopmusic.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^bewegtsitzen\.at$ [NC]
+	RewriteRule ^(.*)$ https://www.bewegtsitzen.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^xn--ergonomische-mbel-d0b\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.xn--ergonomische-mbel-d0b\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^ergo-moebel\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.ergo-moebel\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^ergomoebel\.com$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.ergomoebel\.com$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^ergo-moebel\.com$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.ergo-moebel\.com$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^futureclass\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at/anwendung/schule  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.futureclass\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at/anwendung/schule  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^leitner-moebel\.com$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.leitner-moebel\.com$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^newsletter\.ergomoebel\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^notenpult\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.notenpult\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^wipp-sitz\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.wipp-sitz\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^wippsitz\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.wippsitz\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^xn--ergombel-r4a\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.xn--ergombel-r4a\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^xn--ergonomische-sitzmbel-yec\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.xn--ergonomische-sitzmbel-yec\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^ergoshop\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at/shop/$1  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.ergoshop\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at/shop/$1  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^shopmusic\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at/shop/musik/$1  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.shopmusic\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at/shop/musik/$1  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^bewegtsitzen\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	RewriteCond %{HTTP_HOST} ^www\.bewegtsitzen\.at$ [NC]
+	RewriteRule ^/(.*)$ https://www.ergomoebel.at  [R=301,L]
+	# add support for apache mpm_itk
+	<IfModule mpm_itk_module>
+		AssignUserId web1 client1
+	</IfModule>
+	<IfModule mod_dav_fs.c>
 		# Do not execute PHP files in webdav directory
-			<Directory /var/www/clients/client1/web1/webdav>
-				<ifModule mod_security2.c>
-					SecRuleRemoveById 960015
-					SecRuleRemoveById 960032
-				</ifModule>
-				<FilesMatch "\.ph(p3?|tml)$">
-					SetHandler None
-				</FilesMatch>
-			</Directory>
-			DavLockDB /var/www/clients/client1/web1/tmp/DavLock
-			# DO NOT REMOVE THE COMMENTS!
-			# IF YOU REMOVE THEM, WEBDAV WILL NOT WORK ANYMORE!
-      # WEBDAV BEGIN
-			# WEBDAV END
-		</IfModule>
-
-<IfModule mod_proxy_fcgi.c>
-    #ProxyPassMatch ^/(.*\.php[345]?(/.*)?)$ unix:///var/lib/php7.2-fpm/custom_web1.sock|fcgi://localhost//var/www/clients/client1/web1/web/$1
-    <Directory /var/www/clients/client1/web1/web/shop>
-        <FilesMatch "\.php[345]?$">
-            <If "-f '%{REQUEST_FILENAME}'">
-                SetHandler "proxy:unix:/var/lib/php7.2-fpm/custom_web1.sock|fcgi://localhost"
-            </If>
-        </FilesMatch>
-    </Directory>
-</IfModule>
-
-
-
+		<Directory /var/www/clients/client1/web1/webdav>
+			<ifModule mod_security2.c>
+				SecRuleRemoveById 960015
+				SecRuleRemoveById 960032
+			</ifModule>
+			<FilesMatch "\.ph(p3?|tml)$">
+				SetHandler None
+			</FilesMatch>
+		</Directory>
+		DavLockDB /var/www/clients/client1/web1/tmp/DavLock
+		# DO NOT REMOVE THE COMMENTS!
+		# IF YOU REMOVE THEM, WEBDAV WILL NOT WORK ANYMORE!
+		# WEBDAV BEGIN
+		# WEBDAV END
+	</IfModule>
+	<IfModule mod_proxy_fcgi.c>
+		#ProxyPassMatch ^/(.*\.php[345]?(/.*)?)$ unix:///var/lib/php7.2-fpm/custom_web1.sock|fcgi://localhost//var/www/clients/client1/web1/web/$1
+		<Directory /var/www/clients/client1/web1/web/shop>
+			<FilesMatch "\.php[345]?$">
+				<If "-f '%{REQUEST_FILENAME}'">
+					SetHandler "proxy:unix:/var/lib/php7.2-fpm/custom_web1.sock|fcgi://localhost"
+				</If>
+			</FilesMatch>
+		</Directory>
+	</IfModule>
 </VirtualHost>
-
 <IfModule mod_ssl.c>
-        SSLStaplingCache shmcb:/var/run/ocsp(128000)
+	SSLStaplingCache shmcb:/var/run/ocsp(128000)
 </IfModule>
-
-
-
