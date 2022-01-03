@@ -1,149 +1,118 @@
-
 <Directory /var/www/leitnershop.at>
-		AllowOverride None
-				Require all denied
-		</Directory>
-
+	AllowOverride None
+	Require all denied
+</Directory>
 <VirtualHost *:80>
-
-					DocumentRoot /var/www/clients/client1/web17/web
-			
-		ServerName leitnershop.at
-		ServerAlias www.leitnershop.at 
-    ServerAlias www.leitner-shop.at leitner-shop.at
-		ServerAdmin webmaster@leitnershop.at
-
-
-		ErrorLog /var/log/ispconfig/httpd/leitnershop.at/error.log
-
-
-		<IfModule mod_ssl.c>
-		</IfModule>
-
+	DocumentRoot /var/www/clients/client1/web17/web
+	ServerName leitnershop.at
+	ServerAlias www.leitnershop.at
+	ServerAlias www.leitner-shop.at leitner-shop.at
+	ServerAdmin webmaster@leitnershop.at
+	ErrorLog /var/log/ispconfig/httpd/leitnershop.at/error.log
+	<IfModule mod_ssl.c>
+	</IfModule>
+	<Directory /var/www/leitnershop.at/web>
+		# Clear PHP settings of this website
+		<FilesMatch ".+\.ph(p[345]?|t|tml)$">
+			SetHandler None
+		</FilesMatch>
+		Options +SymlinksIfOwnerMatch
+		AllowOverride All
+		Require all granted
+	</Directory>
+	<Directory /var/www/clients/client1/web17/web>
+		# Clear PHP settings of this website
+		<FilesMatch ".+\.ph(p[345]?|t|tml)$">
+			SetHandler None
+		</FilesMatch>
+		Options +SymlinksIfOwnerMatch
+		AllowOverride All
+		Require all granted
+	</Directory>
+	<IfModule mod_fastcgi.c>
+		<Directory /var/www/clients/client1/web17/cgi-bin>
+			Require all granted
+		</Directory>
 		<Directory /var/www/leitnershop.at/web>
-				# Clear PHP settings of this website
-				<FilesMatch ".+\.ph(p[345]?|t|tml)$">
-						SetHandler None
-				</FilesMatch>
-				Options +SymlinksIfOwnerMatch
-				AllowOverride All
-								Require all granted
-						</Directory>
+			<FilesMatch "\.php[345]?$">
+				SetHandler php-fcgi
+			</FilesMatch>
+		</Directory>
 		<Directory /var/www/clients/client1/web17/web>
-				# Clear PHP settings of this website
-				<FilesMatch ".+\.ph(p[345]?|t|tml)$">
-						SetHandler None
-				</FilesMatch>
-				Options +SymlinksIfOwnerMatch
-				AllowOverride All
-								Require all granted
-						</Directory>
-
-
-
-
-		<IfModule mod_fastcgi.c>
-				<Directory /var/www/clients/client1/web17/cgi-bin>
-										Require all granted
-								    </Directory>
-				<Directory /var/www/leitnershop.at/web>
-					<FilesMatch "\.php[345]?$">
-						SetHandler php-fcgi
-					</FilesMatch>
-				</Directory>
-				<Directory /var/www/clients/client1/web17/web>
-					<FilesMatch "\.php[345]?$">
-						SetHandler php-fcgi
-					</FilesMatch>
-				</Directory>
-                Action php-fcgi /php-fcgi virtual
-				Alias /php-fcgi /var/www/clients/client1/web17/cgi-bin/php-fcgi-*-80-leitnershop.at
-                FastCgiExternalServer /var/www/clients/client1/web17/cgi-bin/php-fcgi-*-80-leitnershop.at -idle-timeout 300 -socket /var/lib/php7.2-fpm/web17.sock -pass-header Authorization  -pass-header Content-Type
-		</IfModule>
-		<IfModule mod_proxy_fcgi.c>
-			#ProxyPassMatch ^/(.*\.php[345]?(/.*)?)$ unix:///var/lib/php7.2-fpm/web17.sock|fcgi://localhost//var/www/clients/client1/web17/web/$1
-			<Directory /var/www/clients/client1/web17/web>
-				<FilesMatch "\.php[345]?$">
-						SetHandler "proxy:unix:/var/lib/php7.2-fpm/web17.sock|fcgi://localhost"
-				</FilesMatch>
-			</Directory>
-			</IfModule>
-
-
-		RewriteEngine on
-		RewriteCond %{REQUEST_URI} ^/\.well-known/acme-challenge/
-		RewriteRule ^ - [END]
-		RewriteCond %{HTTP_HOST} ^leitnershop\.at$ [NC]
-				RewriteRule ^(.*)$ http://www.leitnershop.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^leitner-shop\.at$ [NC]
-				RewriteRule ^(.*)$ http://www.leitner-shop.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST}   ^leitner-shop\.at$ [NC]
-				
-		RewriteRule   ^/(.*)$ https://www.leitnershop.at/$1  [R=301,L]
-	
-		RewriteCond %{HTTP_HOST}   ^www\.leitner-shop\.at$ [NC]
-				
-		RewriteRule   ^/(.*)$ https://www.leitnershop.at/$1  [R=301,L]
-	
-        RewriteCond %{HTTPS} off
-                RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,NE]
-
-		# add support for apache mpm_itk
-		<IfModule mpm_itk_module>
-			AssignUserId web17 client1
-		</IfModule>
-
-		<IfModule mod_dav_fs.c>
+			<FilesMatch "\.php[345]?$">
+				SetHandler php-fcgi
+			</FilesMatch>
+		</Directory>
+		Action php-fcgi /php-fcgi virtual
+		Alias /php-fcgi /var/www/clients/client1/web17/cgi-bin/php-fcgi-*-80-leitnershop.at
+		FastCgiExternalServer /var/www/clients/client1/web17/cgi-bin/php-fcgi-*-80-leitnershop.at -idle-timeout 300 -socket /var/lib/php7.2-fpm/web17.sock -pass-header Authorization  -pass-header Content-Type
+	</IfModule>
+	<IfModule mod_proxy_fcgi.c>
+		#ProxyPassMatch ^/(.*\.php[345]?(/.*)?)$ unix:///var/lib/php7.2-fpm/web17.sock|fcgi://localhost//var/www/clients/client1/web17/web/$1
+		<Directory /var/www/clients/client1/web17/web>
+			<FilesMatch "\.php[345]?$">
+				SetHandler "proxy:unix:/var/lib/php7.2-fpm/web17.sock|fcgi://localhost"
+			</FilesMatch>
+		</Directory>
+	</IfModule>
+	RewriteEngine on
+	RewriteCond %{REQUEST_URI} ^/\.well-known/acme-challenge/
+	RewriteRule ^ - [END]
+	RewriteCond %{HTTP_HOST} ^leitnershop\.at$ [NC]
+	RewriteRule ^(.*)$ http://www.leitnershop.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^leitner-shop\.at$ [NC]
+	RewriteRule ^(.*)$ http://www.leitner-shop.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST}   ^leitner-shop\.at$ [NC]
+	RewriteRule   ^/(.*)$ https://www.leitnershop.at/$1  [R=301,L]
+	RewriteCond %{HTTP_HOST}   ^www\.leitner-shop\.at$ [NC]
+	RewriteRule   ^/(.*)$ https://www.leitnershop.at/$1  [R=301,L]
+	RewriteCond %{HTTPS} off
+	RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,NE]
+	# add support for apache mpm_itk
+	<IfModule mpm_itk_module>
+		AssignUserId web17 client1
+	</IfModule>
+	<IfModule mod_dav_fs.c>
 		# Do not execute PHP files in webdav directory
-			<Directory /var/www/clients/client1/web17/webdav>
-				<ifModule mod_security2.c>
-					SecRuleRemoveById 960015
-					SecRuleRemoveById 960032
-				</ifModule>
-				<FilesMatch "\.ph(p3?|tml)$">
-					SetHandler None
-				</FilesMatch>
-			</Directory>
-			DavLockDB /var/www/clients/client1/web17/tmp/DavLock
-			# DO NOT REMOVE THE COMMENTS!
-			# IF YOU REMOVE THEM, WEBDAV WILL NOT WORK ANYMORE!
-      # WEBDAV BEGIN
-			# WEBDAV END
-		</IfModule>
-
-<Directory /var/www/ergomoebel.at/web>
-              Options +FollowSymLinks
-               AllowOverride All
-               Order allow,deny
-               Allow from all
-</Directory>
-<Directory /var/www/clients/client1/web1/web>
-               Options +FollowSymLinks
-               AllowOverride All
-               Order allow,deny
-               Allow from all
-</Directory>
-
+		<Directory /var/www/clients/client1/web17/webdav>
+			<ifModule mod_security2.c>
+				SecRuleRemoveById 960015
+				SecRuleRemoveById 960032
+			</ifModule>
+			<FilesMatch "\.ph(p3?|tml)$">
+				SetHandler None
+			</FilesMatch>
+		</Directory>
+		DavLockDB /var/www/clients/client1/web17/tmp/DavLock
+		# DO NOT REMOVE THE COMMENTS!
+		# IF YOU REMOVE THEM, WEBDAV WILL NOT WORK ANYMORE!
+		# WEBDAV BEGIN
+		# WEBDAV END
+	</IfModule>
+	<Directory /var/www/ergomoebel.at/web>
+		Options +FollowSymLinks
+		AllowOverride All
+		Order allow,deny
+		Allow from all
+	</Directory>
+	<Directory /var/www/clients/client1/web1/web>
+		Options +FollowSymLinks
+		AllowOverride All
+		Order allow,deny
+		Allow from all
+	</Directory>
 </VirtualHost>
-
-
 <VirtualHost *:443>
-
-					DocumentRoot /var/www/clients/client1/web17/web
-			
-		ServerName leitnershop.at
-		ServerAlias www.leitnershop.at 
-    ServerAlias www.leitner-shop.at leitner-shop.at
-		ServerAdmin webmaster@leitnershop.at
-
-		Protocols h2 http/1.1
-		SSLProtocol All -SSLv2 -SSLv3
-		SSLCipherSuite 'EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384 EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH+aRSA+RC4 EECDH EDH+aRSA !RC4 !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS'
-
-		ErrorLog /var/log/ispconfig/httpd/leitnershop.at/error.log
-
-
-		<IfModule mod_ssl.c>
+	DocumentRoot /var/www/clients/client1/web17/web
+	ServerName leitnershop.at
+	ServerAlias www.leitnershop.at
+	ServerAlias www.leitner-shop.at leitner-shop.at
+	ServerAdmin webmaster@leitnershop.at
+	Protocols h2 http/1.1
+	SSLProtocol All -SSLv2 -SSLv3
+	SSLCipherSuite 'EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384 EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH+aRSA+RC4 EECDH EDH+aRSA !RC4 !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS'
+	ErrorLog /var/log/ispconfig/httpd/leitnershop.at/error.log
+	<IfModule mod_ssl.c>
 		SSLEngine on
 		SSLProtocol All -SSLv2 -SSLv3
 		# SSLCipherSuite          ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS
@@ -153,118 +122,99 @@
 		# </IfModule>
 		SSLCertificateFile /var/www/clients/client1/web17/ssl/leitnershop.at-le.crt
 		SSLCertificateKeyFile /var/www/clients/client1/web17/ssl/leitnershop.at-le.key
-				SSLUseStapling on
+		SSLUseStapling on
 		SSLStaplingResponderTimeout 5
 		SSLStaplingReturnResponderErrors off
-				</IfModule>
-
+	</IfModule>
+	<Directory /var/www/leitnershop.at/web>
+		# Clear PHP settings of this website
+		<FilesMatch ".+\.ph(p[345]?|t|tml)$">
+			SetHandler None
+		</FilesMatch>
+		Options +SymlinksIfOwnerMatch
+		AllowOverride All
+		Require all granted
+	</Directory>
+	<Directory /var/www/clients/client1/web17/web>
+		# Clear PHP settings of this website
+		<FilesMatch ".+\.ph(p[345]?|t|tml)$">
+			SetHandler None
+		</FilesMatch>
+		Options +SymlinksIfOwnerMatch
+		AllowOverride All
+		Require all granted
+	</Directory>
+	<IfModule mod_fastcgi.c>
+		<Directory /var/www/clients/client1/web17/cgi-bin>
+			Require all granted
+		</Directory>
 		<Directory /var/www/leitnershop.at/web>
-				# Clear PHP settings of this website
-				<FilesMatch ".+\.ph(p[345]?|t|tml)$">
-						SetHandler None
-				</FilesMatch>
-				Options +SymlinksIfOwnerMatch
-				AllowOverride All
-								Require all granted
-						</Directory>
+			<FilesMatch "\.php[345]?$">
+				SetHandler php-fcgi
+			</FilesMatch>
+		</Directory>
 		<Directory /var/www/clients/client1/web17/web>
-				# Clear PHP settings of this website
-				<FilesMatch ".+\.ph(p[345]?|t|tml)$">
-						SetHandler None
-				</FilesMatch>
-				Options +SymlinksIfOwnerMatch
-				AllowOverride All
-								Require all granted
-						</Directory>
-
-
-
-
-		<IfModule mod_fastcgi.c>
-				<Directory /var/www/clients/client1/web17/cgi-bin>
-										Require all granted
-								    </Directory>
-				<Directory /var/www/leitnershop.at/web>
-					<FilesMatch "\.php[345]?$">
-						SetHandler php-fcgi
-					</FilesMatch>
-				</Directory>
-				<Directory /var/www/clients/client1/web17/web>
-					<FilesMatch "\.php[345]?$">
-						SetHandler php-fcgi
-					</FilesMatch>
-				</Directory>
-                Action php-fcgi /php-fcgi virtual
-				Alias /php-fcgi /var/www/clients/client1/web17/cgi-bin/php-fcgi-*-443-leitnershop.at
-                FastCgiExternalServer /var/www/clients/client1/web17/cgi-bin/php-fcgi-*-443-leitnershop.at -idle-timeout 300 -socket /var/lib/php7.2-fpm/web17.sock -pass-header Authorization  -pass-header Content-Type
-		</IfModule>
-		<IfModule mod_proxy_fcgi.c>
-			#ProxyPassMatch ^/(.*\.php[345]?(/.*)?)$ unix:///var/lib/php7.2-fpm/web17.sock|fcgi://localhost//var/www/clients/client1/web17/web/$1
-			<Directory /var/www/clients/client1/web17/web>
-				<FilesMatch "\.php[345]?$">
-						SetHandler "proxy:unix:/var/lib/php7.2-fpm/web17.sock|fcgi://localhost"
-				</FilesMatch>
-			</Directory>
-			</IfModule>
-
-
-		RewriteEngine on
-		RewriteCond %{REQUEST_URI} ^/\.well-known/acme-challenge/
-		RewriteRule ^ - [END]
-		RewriteCond %{HTTP_HOST} ^leitnershop\.at$ [NC]
-				RewriteRule ^(.*)$ https://www.leitnershop.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST} ^leitner-shop\.at$ [NC]
-				RewriteRule ^(.*)$ https://www.leitner-shop.at$1 [R=301,NE,L]
-		RewriteCond %{HTTP_HOST}   ^leitner-shop\.at$ [NC]
-				
-		RewriteRule   ^/(.*)$ https://www.leitnershop.at/$1  [R=301,L]
-	
-		RewriteCond %{HTTP_HOST}   ^www\.leitner-shop\.at$ [NC]
-				
-		RewriteRule   ^/(.*)$ https://www.leitnershop.at/$1  [R=301,L]
-	
-
-		# add support for apache mpm_itk
-		<IfModule mpm_itk_module>
-			AssignUserId web17 client1
-		</IfModule>
-
-		<IfModule mod_dav_fs.c>
+			<FilesMatch "\.php[345]?$">
+				SetHandler php-fcgi
+			</FilesMatch>
+		</Directory>
+		Action php-fcgi /php-fcgi virtual
+		Alias /php-fcgi /var/www/clients/client1/web17/cgi-bin/php-fcgi-*-443-leitnershop.at
+		FastCgiExternalServer /var/www/clients/client1/web17/cgi-bin/php-fcgi-*-443-leitnershop.at -idle-timeout 300 -socket /var/lib/php7.2-fpm/web17.sock -pass-header Authorization  -pass-header Content-Type
+	</IfModule>
+	<IfModule mod_proxy_fcgi.c>
+		#ProxyPassMatch ^/(.*\.php[345]?(/.*)?)$ unix:///var/lib/php7.2-fpm/web17.sock|fcgi://localhost//var/www/clients/client1/web17/web/$1
+		<Directory /var/www/clients/client1/web17/web>
+			<FilesMatch "\.php[345]?$">
+				SetHandler "proxy:unix:/var/lib/php7.2-fpm/web17.sock|fcgi://localhost"
+			</FilesMatch>
+		</Directory>
+	</IfModule>
+	RewriteEngine on
+	RewriteCond %{REQUEST_URI} ^/\.well-known/acme-challenge/
+	RewriteRule ^ - [END]
+	RewriteCond %{HTTP_HOST} ^leitnershop\.at$ [NC]
+	RewriteRule ^(.*)$ https://www.leitnershop.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST} ^leitner-shop\.at$ [NC]
+	RewriteRule ^(.*)$ https://www.leitner-shop.at$1 [R=301,NE,L]
+	RewriteCond %{HTTP_HOST}   ^leitner-shop\.at$ [NC]
+	RewriteRule   ^/(.*)$ https://www.leitnershop.at/$1  [R=301,L]
+	RewriteCond %{HTTP_HOST}   ^www\.leitner-shop\.at$ [NC]
+	RewriteRule   ^/(.*)$ https://www.leitnershop.at/$1  [R=301,L]
+	# add support for apache mpm_itk
+	<IfModule mpm_itk_module>
+		AssignUserId web17 client1
+	</IfModule>
+	<IfModule mod_dav_fs.c>
 		# Do not execute PHP files in webdav directory
-			<Directory /var/www/clients/client1/web17/webdav>
-				<ifModule mod_security2.c>
-					SecRuleRemoveById 960015
-					SecRuleRemoveById 960032
-				</ifModule>
-				<FilesMatch "\.ph(p3?|tml)$">
-					SetHandler None
-				</FilesMatch>
-			</Directory>
-			DavLockDB /var/www/clients/client1/web17/tmp/DavLock
-			# DO NOT REMOVE THE COMMENTS!
-			# IF YOU REMOVE THEM, WEBDAV WILL NOT WORK ANYMORE!
-      # WEBDAV BEGIN
-			# WEBDAV END
-		</IfModule>
-
-<Directory /var/www/ergomoebel.at/web>
-              Options +FollowSymLinks
-               AllowOverride All
-               Order allow,deny
-               Allow from all
-</Directory>
-<Directory /var/www/clients/client1/web1/web>
-               Options +FollowSymLinks
-               AllowOverride All
-               Order allow,deny
-               Allow from all
-</Directory>
-
+		<Directory /var/www/clients/client1/web17/webdav>
+			<ifModule mod_security2.c>
+				SecRuleRemoveById 960015
+				SecRuleRemoveById 960032
+			</ifModule>
+			<FilesMatch "\.ph(p3?|tml)$">
+				SetHandler None
+			</FilesMatch>
+		</Directory>
+		DavLockDB /var/www/clients/client1/web17/tmp/DavLock
+		# DO NOT REMOVE THE COMMENTS!
+		# IF YOU REMOVE THEM, WEBDAV WILL NOT WORK ANYMORE!
+		# WEBDAV BEGIN
+		# WEBDAV END
+	</IfModule>
+	<Directory /var/www/ergomoebel.at/web>
+		Options +FollowSymLinks
+		AllowOverride All
+		Order allow,deny
+		Allow from all
+	</Directory>
+	<Directory /var/www/clients/client1/web1/web>
+		Options +FollowSymLinks
+		AllowOverride All
+		Order allow,deny
+		Allow from all
+	</Directory>
 </VirtualHost>
-
 <IfModule mod_ssl.c>
-        SSLStaplingCache shmcb:/var/run/ocsp(128000)
+	SSLStaplingCache shmcb:/var/run/ocsp(128000)
 </IfModule>
-
-
-
