@@ -1,8 +1,9 @@
 ### ISPConfig folder protection begin ###
-AuthType Basic
-AuthName "Members Only"
-AuthUserFile /var/www/clients/client1/web17/web/.htpasswd
-require valid-user
+# 2022-01-04 Dmitry Fedyuk https://www.upwork.com/fl/mage2pro
+#AuthType Basic
+#AuthName "Members Only"
+#AuthUserFile /var/www/clients/client1/web17/web/.htpasswd
+#require valid-user
 ### ISPConfig folder protection end ###
 
 ############################################
