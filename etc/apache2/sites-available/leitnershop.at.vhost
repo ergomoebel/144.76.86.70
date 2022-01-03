@@ -9,8 +9,6 @@
 	ServerAlias www.leitner-shop.at leitner-shop.at
 	ServerAdmin webmaster@leitnershop.at
 	ErrorLog /var/log/ispconfig/httpd/leitnershop.at/error.log
-	<IfModule mod_ssl.c>
-	</IfModule>
 	<Directory /var/www/leitnershop.at/web>
 		# Clear PHP settings of this website
 		<FilesMatch ".+\.ph(p[345]?|t|tml)$">
